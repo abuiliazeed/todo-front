@@ -1,0 +1,446 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "TODO List API",
+        "description": "\n    A modern TODO List API with user authentication and CRUD operations.\n    \n    ## Features\n    * User registration and authentication using Basic Auth\n    * Create, read, update, and delete TODO items\n    * Each user can only access their own TODOs\n    * Secure password hashing\n    \n    ## Authentication\n    This API uses HTTP Basic Authentication. Include your username and password with each request.\n    ",
+        "contact": {
+            "name": "API Support",
+            "email": "support@todoapi.com"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/users/": {
+            "post": {
+                "summary": "Create a new user",
+                "description": "Create a new user with the following information:\n    \n    - **username**: Unique username for the account\n    - **password**: Strong password for authentication\n    \n    The password will be hashed before storage.",
+                "operationId": "create_user_users__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created user object",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Username already exists"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me/": {
+            "get": {
+                "summary": "Get current user information",
+                "description": "Retrieve the information of the currently authenticated user.",
+                "operationId": "read_users_me_users_me__get",
+                "responses": {
+                    "200": {
+                        "description": "The current user's information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            }
+        },
+        "/": {
+            "get": {
+                "summary": "API Welcome Page",
+                "description": "Returns welcome message and a comprehensive list of all available endpoints.",
+                "operationId": "index__get",
+                "responses": {
+                    "200": {
+                        "description": "Welcome message and detailed endpoints overview",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/todos": {
+            "get": {
+                "summary": "List all TODOs",
+                "description": "Retrieve all TODOs for the authenticated user.\n    \n    The response will be a list of TODO items, each containing:\n    - **id**: Unique identifier\n    - **title**: The TODO item's title\n    - **completed**: Whether the TODO is completed\n    - **owner**: Username of the TODO item's owner",
+                "operationId": "read_todos_todos_get",
+                "responses": {
+                    "200": {
+                        "description": "List of TODO items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Todo"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Read Todos Todos Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Create a new TODO",
+                "description": "Create a new TODO item with the following information:\n    \n    - **title**: The title of the TODO item\n    - **completed**: Whether the TODO is completed (defaults to false)\n    \n    The TODO will be automatically associated with the authenticated user.",
+                "operationId": "create_todo_todos_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TodoCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "The created TODO item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ]
+            }
+        },
+        "/todos/{todo_id}": {
+            "get": {
+                "summary": "Get a specific TODO",
+                "description": "Retrieve a specific TODO item by its ID.\n    \n    Parameters:\n    - **todo_id**: The unique identifier of the TODO item",
+                "operationId": "read_todo_todos__todo_id__get",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "todo_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Todo Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The requested TODO item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "TODO item not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update a TODO",
+                "description": "Update an existing TODO item by its ID.\n    \n    Parameters:\n    - **todo_id**: The unique identifier of the TODO item\n    - **title**: New title for the TODO item\n    - **completed**: New completion status\n    \n    Only the owner can update their TODOs.",
+                "operationId": "update_todo_todos__todo_id__put",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "todo_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Todo Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TodoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The updated TODO item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Todo"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "TODO item not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a TODO",
+                "description": "Delete a specific TODO item by its ID.\n    \n    Parameters:\n    - **todo_id**: The unique identifier of the TODO item to delete\n    \n    Only the owner can delete their TODOs.",
+                "operationId": "delete_todo_todos__todo_id__delete",
+                "security": [
+                    {
+                        "HTTPBasic": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "todo_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Todo Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content, successful deletion"
+                    },
+                    "404": {
+                        "description": "TODO item not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Todo": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "completed": {
+                        "type": "boolean",
+                        "title": "Completed"
+                    },
+                    "owner": {
+                        "type": "string",
+                        "title": "Owner"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "completed",
+                    "owner"
+                ],
+                "title": "Todo"
+            },
+            "TodoCreate": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "completed": {
+                        "type": "boolean",
+                        "title": "Completed",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title"
+                ],
+                "title": "TodoCreate"
+            },
+            "User": {
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "username"
+                ],
+                "title": "User"
+            },
+            "UserCreate": {
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "title": "UserCreate"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        },
+        "securitySchemes": {
+            "HTTPBasic": {
+                "type": "http",
+                "scheme": "basic"
+            }
+        }
+    }
+}
